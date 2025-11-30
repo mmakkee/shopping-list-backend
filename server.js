@@ -1,8 +1,10 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const app = express();
 const PORT = 3005;
 
+app.use(cors());
 app.use(express.json());
 
 const AWID = "awid-license-owner-id";
@@ -54,6 +56,26 @@ const authMiddleware = (req, res, next) => {
 };
 
 app.use(authMiddleware);
+
+// list/list
+app.get("/list/list", async (req, res) => {
+  try {
+    const lists = await ShoppingList.find({
+      $or: [
+        { ownerId: req.user.id },
+        { members: req.user.id }
+      ]
+    });
+
+    res.json({
+      awid: AWID,
+      lists: lists,
+      uuAppErrorMap: {}
+    });
+  } catch (e) {
+    res.status(500).json({ uuAppErrorMap: createError("list/list/sys", e.message) });
+  }
+});
 
 // list/create
 app.post("/list/create", async (req, res) => {
