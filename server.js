@@ -10,9 +10,11 @@ app.use(express.json());
 const AWID = "awid-license-owner-id";
 const MONGO_URI = "mongodb://localhost:27017/";
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("Could not connect to MongoDB", err));
+if (require.main === module) {
+  mongoose.connect(MONGO_URI)
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => console.error("Could not connect to MongoDB", err));
+}
 
 const itemSchema = new mongoose.Schema({
   text: { type: String, required: true },
@@ -251,6 +253,10 @@ app.get("/item/list", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = { app, ShoppingList };
